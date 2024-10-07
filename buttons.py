@@ -12,3 +12,9 @@ def create_alert_keyboard():
     button_cancel = KeyboardButton("Отмена")  
     keyboard.add(button_alert, button_cancel)
     return keyboard
+
+def create_location_keyboard():
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    button_location = KeyboardButton("Отправить местоположение", request_location=True)
+    keyboard.add(button_location)
+    return keyboard
