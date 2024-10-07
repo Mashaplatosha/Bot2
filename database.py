@@ -23,5 +23,15 @@ def create_tables():
     conn.commit()
     conn.close()
 
+def save_user_alert(telegram_id, phone_number, alert_time=None, location=None):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO user_alerts (telegram_id, phone_number, alert_time, location)
+        VALUES (?, ?, ?, ?)
+    """, (telegram_id, phone_number, alert_time, location))
+    conn.commit()
+    conn.close()
+    
 if __name__ == '__main__':
     create_tables()
