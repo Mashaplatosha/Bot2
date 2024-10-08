@@ -1,3 +1,4 @@
 .env
 alertbase.db
 venv/
+__pycache__/
