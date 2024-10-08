@@ -1,15 +1,18 @@
 from aiogram import types
-from aiogram.dispatcher import Dispatcher
-from aiogram.dispatcher.filters import Text
+from aiogram import Router
 from buttons import create_start_keyboard, create_alert_keyboard, create_location_keyboard
 from database import save_user_alert
 from aiogram.utils.exceptions import Throttled
 
-# Start 
+router = Router()
+
+# Start
+@router.message(commands=['start']) 
 async def start_command(message: types.Message):
     await message.reply("Пожалуйста, поделитесь своим контактом, чтобы пользоваться ботом.", reply_markup=create_start_keyboard())
 
-# Getting a phone number
+# Getting a phone 
+@router.message(content_types=types.ContentType.CONTACT)
 async def contact_handler(message: types.Message):
     user_id = message.from_user.id
     phone_number = message.contact.phone_number
@@ -20,6 +23,7 @@ async def contact_handler(message: types.Message):
     await message.reply("Если вы видите или слышите беспилотник, нажмите кнопку ОПАСНОСТЬ БПЛА, чтобы предупредить других пользователей.", reply_markup=create_alert_keyboard())
 
 # ОПАСНОСТЬ БПЛА
+@router.message(Text(equals="ОПАСНОСТЬ БПЛА"))
 async def alert_handler(message: types.Message):
     user_id = message.from_user.id
 
@@ -35,6 +39,7 @@ async def alert_handler(message: types.Message):
     await message.reply("Пожалуйста, отправьте свое местоположение.", reply_markup=create_location_keyboard())
 
 # Handle location
+@router.message(content_types=types.ContentType.LOCATION)
 async def location_handler(message: types.Message):
     user_id = message.from_user.id
     location = f"Широта: {message.location.latitude}, Долгота: {message.location.longitude}"
@@ -46,9 +51,3 @@ async def location_handler(message: types.Message):
     # Message to all users
     alert_message = f"Обнаружен БПЛА! Местоположение: {location}"
     await message.bot.send_message(chat_id=message.chat.id, text=alert_message)
-
-def register_handlers(dp: Dispatcher):
-    dp.register_message_handler(start_command, commands=['start'])
-    dp.register_message_handler(contact_handler, content_types=types.ContentType.CONTACT)
-    dp.register_message_handler(alert_handler, Text(equals="ОПАСНОСТЬ БПЛА"))
-    dp.register_message_handler(location_handler, content_types=types.ContentType.LOCATION)

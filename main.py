@@ -2,12 +2,12 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from config import TELEGRAM_TOKEN
-from handlers import register_handlers
+from handlers import router
 
 bot = Bot(token=TELEGRAM_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 
-register_handlers(dp)
+dp.include_router(router)
 
 async def main():
     await dp.start_polling(bot)
