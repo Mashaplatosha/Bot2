@@ -1,8 +1,12 @@
 from aiogram import types
 from aiogram import Router
+from aiogram.filters import Text
 from buttons import create_start_keyboard, create_alert_keyboard, create_location_keyboard
 from database import save_user_alert
-from aiogram.utils.exceptions import Throttled
+from aiogram.fsm import Throttled
+from datetime import datetime
+
+
 
 router = Router()
 
@@ -30,9 +34,8 @@ async def alert_handler(message: types.Message):
     # Limit 10 min
     try:
         await message.bot.throttle('alert', rate=600)  
-        await message.reply("Вы уже отправили сообщение об опасности. Подождите 10 минут перед повторной отправкой.")
-        return
     except Throttled:
+        await message.reply("Вы уже отправили сообщение об опасности. Подождите 10 минут перед повторной отправкой.")
         return
 
     # Send location
@@ -43,7 +46,7 @@ async def alert_handler(message: types.Message):
 async def location_handler(message: types.Message):
     user_id = message.from_user.id
     location = f"Широта: {message.location.latitude}, Долгота: {message.location.longitude}"
-    alert_time = None  # Здесь можно указать текущее время
+    alert_time = datetime.now()
     
     # Save in base
     save_user_alert(user_id, phone_number="", alert_time=alert_time, location=location)  
